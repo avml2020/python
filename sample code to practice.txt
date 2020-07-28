@@ -1,0 +1,91 @@
+import pandas as pd
+df = pd.read_csv('pokemon_data.csv')
+print(df.head(5))
+print(df.tail(5))
+
+#####----Reading the data from dataframe-----######
+
+#for all columns
+df.columns
+#for specific columns
+print(df[['Name','Type 1','Type 2','HP']])
+#for printing data with indexing
+print(df.iloc[0:4])
+
+#forloop for indexing print
+for index,row in df.iterrows():
+    print(index,row['Name'])
+    
+#finding specific data point from a data frame
+df.loc[df['Type 1']=='Grass']
+
+#sorting the data
+df.sort_values(['Type 1','HP'])
+
+######----manipulating data-----######
+#adding additional total column to df dataframe 
+#method 1
+df['Total'] = df['HP']+df['Attack']+df['Defense']+df['Sp. Atk']+df['Sp. Def']+df['Speed']
+
+#drop the total column
+df = df.drop(columns=['Total'])
+
+#method 2
+df['Total'] = df.iloc[:,4:10].sum(axis=1)
+
+
+#rearanging columns
+newcols = list(df.columns.values)
+df = df[newcols[0:4]+[newcols[-1]]+newcols[4:12]]
+
+
+#to save new csv file will all new changes
+df.to_csv('modified.csv',index=False)
+
+
+######----filtering data-----######
+df.loc[(df['Type 1']=='Grass')]
+df.loc[(df['Type 2']=='Poison')]
+df.loc[(df['HP'] > 70)]
+
+#using and condition
+df.loc[(df['Type 1']=='Grass') & (df['Type 2']=='Poison')]
+
+#saving it into a new dataframe
+new_grass_posion = df.loc[(df['Type 1']=='Grass') & (df['Type 2']=='Poison') & (df['HP'] > 70)]
+
+
+#droping the old index for the new dataframe
+new_grass_posion.reset_index(drop=True,inplace = True)
+print(new_grass_posion.head(5))
+
+#finding specific string with a keyword by using str.contains
+df.loc[df['Name'].str.contains('Mega')]
+
+#finding specific string with not having a specific keyword
+df.loc[~df['Name'].str.contains('Mega')]
+
+######----conditional changes to the dataframe-----######
+#single condition
+df.loc[df['Total']>500,['Generation']] = ['True']
+#Multi condition
+df.loc[df['Total']>500,['Generation','Legendary']]=['TT1','TT2']
+
+#######----aggregation-----######
+dff = pd.read_csv('modified.csv')
+
+dff.groupby(['Type 1']).mean().sort_values('Defense',ascending=False)
+
+dff.groupby(['Type 1']).count().sort_values('Defense',ascending=False)
+
+#adding an aditional column for count purpose
+dff['count'] =1
+
+#display type1,type2 and count
+dff.groupby(['Type 1','Type 2']).count()['count']
+
+
+
+
+
+
